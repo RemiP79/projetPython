@@ -1,55 +1,59 @@
+import sqlite3
 from flask import Flask, redirect, url_for, render_template,request
-from markupsafe import escape
-from flaskr import db
+#from markupsafe import escape
+from flask import g
 
+DATABASE = 'database.db'
 
-def create_app():
-    app = Flask(__name__)
+def get_db():
+    db = getattr(g, '_database', None)
+    if db is None:
+        db = g._database = sqlite3.connect(DATABASE)
+    db.row_factory = sqlite3.Row
+    return db
 
-    # Autres configurations de l'application...
+def close_connection(exception):
+    db = getattr(g, '_database', None)
+    if db is not None:
+        db.close()
 
-    # Initialise la base de données
-    db.init_app(app)
+def init_db():    
+        with app.app_context():
+            db = get_db()
+            with app.open_resource('schema.sql', mode='r') as f:
+                db.cursor().executescript(f.read())
+            db.commit()
 
-    # Autres configurations de l'application...
-
-    return app
-
-
-#from flask import request
-#@app.route('/login', methods=['GET', 'POST'])
-#def login():
-#    if request.method == 'POST':
-#        return do_the_login()
-#    else:
-#        return show_the_login_form()
-
-
-#app = create_app()
 app = Flask(__name__)
 
 @app.route('/user/<username>',endpoint='profile')
 def profile(username):           
-    return render_template('user.html.jinja', username=username)
+    return render_template('user.html', username=username)
 
 @app.route("/")
 def welcome():
+    if 'db' not in g:
+        init_db()
+    else :
+        get_db()
     return render_template('welcome.html')
 
 @app.route("/login", methods=['GET'])
 def login():
     return render_template('login.html')
 
-@app.route("/login", methods=['POST'])
+@app.route("/login", methods=['GET','POST'])
 def auth():
-    if request.method == 'POST':   
-        username = request.form['username']
+    if request.method == 'POST':          
+        email = request.form['email']
         password = request.form['password']
-            
-        # Validation des informations d'identification (exemple simplifié)
-        if username == 'rem' and password == '12345':
+        db = get_db()
+        cursor = db.execute('SELECT * FROM user WHERE email=? AND password=?', (email, password))
+        user = cursor.fetchone()
+        # Validation des informations d'identification
+        if user:
             # Informations d'identification valides, rediriger vers la page de profil
-            return redirect(url_for('profile', username=username))
+            return redirect(url_for('profile', username=user['username']))
         else:
             # Informations d'identification incorrectes, afficher un message d'erreur ou rediriger vers la page de connexion avec un message d'erreur
             return render_template('login.html', error="Nom d'utilisateur ou mot de passe incorrect.")
@@ -60,9 +64,18 @@ def auth():
 
 
 
-@app.route('/<username>/enigme/<int:id_enigme>')
+@app.route('/<username>/enigme/<int:id_enigme>/', methods=['GET'])
 def enigme(username, id_enigme):
-    return render_template('enigme.html.jinja', username=username, id_enigme=id_enigme)
+    db = get_db()
+    cursor = db.execute('SELECT * FROM enigma WHERE id = ?', (id_enigme,))
+    enigme_info = cursor.fetchone()
+    image_url = enigme_info['image_url']
+    if enigme_info:
+        # Passer les informations de l'énigme à la template HTML
+        return render_template('enigme.html', username=username, id_enigme=id_enigme, image_url=image_url)
+    else:
+        # Gérer le cas où l'énigme n'est pas trouvée
+        return "Énigme non trouvée"
 
 
 
@@ -71,14 +84,6 @@ with app.test_request_context():
 
 
 if __name__ == "__main__":
-    app = create_app()
+   # app = create_app()
     app.run(debug=True)
 
-#@app.route("/<name>")
-#def hello(name):
-#    return f"Hello, {escape(name)}!"
-
-
-#@app.route('/login')
-#def login():
-#    return 'login'

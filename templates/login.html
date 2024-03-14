@@ -11,10 +11,10 @@
     <p style="color: red;">{{ error }}</p>
     {% endif %}
     <form action="/login" method="POST">
-        <label for="username">Nom d'utilisateur :</label>
-        <input type="text" id="username" name="username" required><br><br>
+        <label for="email">votre mail :</label>
+        <input type="text" id="email" name="email" placeholder="monmail@ngft.com" required><br><br>
         <label for="password">Mot de passe :</label>
-        <input type="password" id="password" name="password" required><br><br>
+        <input type="password" id="password" name="password" placeholder="monmotdepasse"><br><br>
         <button type="submit">Se connecter</button>
     </form>
 </body>
