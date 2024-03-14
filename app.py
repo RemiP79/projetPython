@@ -66,13 +66,22 @@ def auth():
 
 @app.route('/<username>/enigme/<int:id_enigme>/', methods=['GET'])
 def enigme(username, id_enigme):
-    db = get_db()
+    db = get_db()   
     cursor = db.execute('SELECT * FROM enigma WHERE id = ?', (id_enigme,))
-    enigme_info = cursor.fetchone()
-    image_url = enigme_info['image_url']
+    enigme_info = cursor.fetchone()  
+    
+    cursor = db.execute('SELECT * FROM bad_response WHERE id = ?', (id_enigme,))
+    bad_responses = cursor.fetchone()
+
     if enigme_info:
+        image_url = enigme_info['image_url']
+        title = enigme_info['title']
+        good_response = enigme_info['good_response']
+        link_good_response = enigme_info['link_good_response']
+        bad_response = bad_responses['bad_responses']
+
         # Passer les informations de l'énigme à la template HTML
-        return render_template('enigme.html', username=username, id_enigme=id_enigme, image_url=image_url)
+        return render_template('enigme.html', username=username, id_enigme=id_enigme, enigme_info=enigme_info, image_url=image_url, title=title, bad_responses_info=bad_responses,  bad_response=bad_response, good_response= good_response, link_good_response=link_good_response)
     else:
         # Gérer le cas où l'énigme n'est pas trouvée
         return "Énigme non trouvée"

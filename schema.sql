@@ -21,18 +21,12 @@ CREATE TABLE enigma (
 
 CREATE TABLE bad_response (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    bad_responses TEXT NOT NULL --Stokage under json possible
+    bad_responses TEXT NOT NULL, --Stokage under json possible
+    enigma_id INTEGER,
+    FOREIGN KEY (enigma_id) REFERENCES enigma(id)    
 );
 
-CREATE TABLE enigma_bad_response (
-    enigma_id INTEGER,
-    bad_response_id INTEGER,
-    FOREIGN KEY (enigma_id) REFERENCES enigma(id),
-    FOREIGN KEY (bad_response_id) REFERENCES bad_response(id),
-    PRIMARY KEY (enigma_id, bad_response_id)
-);
 
 INSERT INTO user (email, username, password) VALUES ('monmail@ngft.com', 'Rem', 'monmotdepasse');
-INSERT INTO enigma (title, image_url, good_response, link_good_response, Message_bad_response) VALUES ('Énigme 1', '/image1.jpg', 'Bonne réponse 1', 'lien1', 'Mauvaise réponse 1');
-INSERT INTO bad_response (bad_responses) VALUES ('Mauvaise réponse 1');
-INSERT INTO enigma_bad_response (enigma_id, bad_response_id) VALUES (1, 1);
+INSERT INTO enigma (title, image_url, good_response, link_good_response, Message_bad_response) VALUES ('Qui est le meilleur prof du monde ?', '/image1.jpg', 'Guillaume', 'http://127.0.0.1:5000/{{username}}/enigme/{{id_enigme+1}}', 'Mauvaise réponse !!!');
+INSERT INTO bad_response (bad_responses) VALUES ('Professeur Tournesol');

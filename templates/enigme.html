@@ -3,13 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{enigme}}</title>
+    <title>Enigme {{id_enigme}}</title>
 </head>
 <body>
     <p>Bienvenue {{username}} sur l'enigme {{id_enigme}}</p>
     <img src="{{url_for('static', filename=image_url)}}" alt="Image de l'énigme {{id_enigme}}">
-    <p>{{title}}</p>
-    <div id="boutonsReponses"><button><a href=http://127.0.0.1:5000/{{username}}/enigme/{{id_enigme+1}}>Enigme suivante</a></button></div>
+    <p>La question : {{title}}</p>
+    <div id="boutonsReponses"><button><a href=http://127.0.0.1:5000/{{username}}/enigme/{{id_enigme+1}}>{{bad_response}}</a></button></div>
+    <div id="boutonsReponses"><button><a href={{link_good_response}}>{{good_response}}</a></button></div>
+    
     <!-- Contenu de la page ici -->
 </body>
 </html>
