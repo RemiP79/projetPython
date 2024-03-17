@@ -6,6 +6,7 @@ from flask import g
 DATABASE = 'database.db'
 
 def get_db():
+    """Retrieve a connection to DATABASE"""
     db = getattr(g, '_database', None)
     if db is None:
         db = g._database = sqlite3.connect(DATABASE)
@@ -13,86 +14,104 @@ def get_db():
     return db
 
 def close_connection(exception):
+    """Close connection to DATABASE"""
     db = getattr(g, '_database', None)
     if db is not None:
         db.close()
 
-def init_db():    
+def init_db():
+        """Initializes DATABASE by executing script contained in a file schema.sql"""    
         with app.app_context():
             db = get_db()
+            db.cursor().execute("PRAGMA encoding = 'UTF-8';")  # Configue UTF-8
+
             with app.open_resource('schema.sql', mode='r') as f:
                 db.cursor().executescript(f.read())
             db.commit()
 
-app = Flask(__name__)
 
-@app.route('/user/<username>',endpoint='profile')
-def profile(username):           
-    return render_template('user.html', username=username)
+app = Flask(__name__)
 
 @app.route("/")
 def welcome():
+    """Database initialization upon home page connection"""
     if 'db' not in g:
         init_db()
     else :
         get_db()
     return render_template('welcome.html')
 
-@app.route("/login", methods=['GET'])
-def login():
-    return render_template('login.html')
-
 @app.route("/login", methods=['GET','POST'])
 def auth():
+    """Handles user authentication - retrieves the email and password from the login form"""
     if request.method == 'POST':          
         email = request.form['email']
         password = request.form['password']
         db = get_db()
         cursor = db.execute('SELECT * FROM user WHERE email=? AND password=?', (email, password))
         user = cursor.fetchone()
-        # Validation des informations d'identification
+        close_connection(None)
+        # Credentials validation
         if user:
-            # Informations d'identification valides, rediriger vers la page de profil
+            # redirect to the profile page
             return redirect(url_for('profile', username=user['username']))
         else:
-            # Informations d'identification incorrectes, afficher un message d'erreur ou rediriger vers la page de connexion avec un message d'erreur
+            # error message
             return render_template('login.html', error="Nom d'utilisateur ou mot de passe incorrect.")
-    else:
-        # Afficher le formulaire de connexion  
+    else:        
         return render_template('login.html')
 
+@app.route('/user/<username>',endpoint='profile')
+def profile(username): 
+    """Connected page - page to begin game
+    Parameters: username (str)"""          
+    return render_template('user.html', username=username)
 
-
-
-@app.route('/<username>/enigme/<int:id_enigme>/', methods=['GET'])
-def enigme(username, id_enigme):
-    db = get_db()   
-    cursor = db.execute('SELECT * FROM enigma WHERE id = ?', (id_enigme,))
-    enigme_info = cursor.fetchone()  
-    
-    cursor = db.execute('SELECT * FROM bad_response WHERE id = ?', (id_enigme,))
+@app.route('/<username>/enigme/<int:id_enigma>/', methods=['GET'])
+def enigma(username, id_enigma):
+    """Handles the display of an enigma page;
+    Parameters: username (str) and id_enigma (int).
+    Tables : enigma and bad_response"""   
+       
+    db = get_db()       
+    cursor = db.execute('SELECT * FROM enigma WHERE id = ?', (id_enigma,))
+    enigma_info = cursor.fetchone()    
+    cursor = db.execute('SELECT * FROM bad_response WHERE id = ?', (id_enigma,))    
     bad_responses = cursor.fetchone()
+    close_connection(None)    
 
-    if enigme_info:
-        image_url = enigme_info['image_url']
-        title = enigme_info['title']
-        good_response = enigme_info['good_response']
-        link_good_response = enigme_info['link_good_response']
-        bad_response = bad_responses['bad_responses']
+    if enigma_info:
+        image_url = enigma_info['image_url']
+        title = enigma_info['title']
+        good_response = enigma_info['good_response']
+        link_good_response = enigma_info['link_good_response']
+        bad_response = bad_responses['bad_responses']       
 
-        # Passer les informations de l'énigme à la template HTML
-        return render_template('enigme.html', username=username, id_enigme=id_enigme, enigme_info=enigme_info, image_url=image_url, title=title, bad_responses_info=bad_responses,  bad_response=bad_response, good_response= good_response, link_good_response=link_good_response)
+        # Pass the enigma information to the HTML template
+        return render_template('enigma.html',
+                               error="Mauvaise réponse", 
+                               username=username, 
+                               id_enigma=id_enigma, 
+                               enigma_info=enigma_info, 
+                               image_url=image_url, title=title,  
+                               bad_response=bad_response, 
+                               good_response= good_response, 
+                               link_good_response=link_good_response)
     else:
-        # Gérer le cas où l'énigme n'est pas trouvée
+        # enigma not found    
         return "Énigme non trouvée"
 
-
+@app.route('/<username>/endpage')
+def endpage(username):
+    """When user win"""
+    return render_template("endpage.html", username=username)
 
 with app.test_request_context():
+    """Test URL generation for welcome view"""
     print(url_for('welcome'))
-
-
+    
 if __name__ == "__main__":
-   # app = create_app()
+    """creates an instance of the Flask application 
+    and runs the development server with debug mode enabled."""
     app.run(debug=True)
 

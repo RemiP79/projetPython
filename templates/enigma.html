@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enigme {{id_enigma}}</title>
+</head>
+<body>
+    <div id="boutonsReponses"><button><a href="{{url_for('welcome')}}">Déconnexion</a></button></div>
+    <p>Bienvenue {{username}} sur l'énigme {{id_enigma}}</p>
+    <img src="{{url_for('static', filename=image_url)}}" alt="Image de l'énigme {{id_enigma}}">
+    <p>La question : {{title}}</p>
+    
+    <div id="boutonsReponses"><button onclick="afficherErreur('{{ error }}')">{{bad_response}}</a></button></div>
+    <div id="boutonsReponses"><button><a href={{link_good_response}}>{{good_response}}</a></button></div>
+    
+    <!-- Contenu de la page ici -->
+    <script>
+        function afficherErreur(message) {
+            alert(message);
+        }
+    </script>
+</body>
+</html>
