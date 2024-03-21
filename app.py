@@ -63,6 +63,32 @@ def auth():
     else:        
         return render_template('login.html')
 
+
+@app.route("/create_user", methods=['GET', 'POST'])
+def create_user():
+    """Create new user in database"""
+    if request.method == 'POST':        
+        username = request.form['username']
+        email = request.form['email']
+        password = request.form['password']
+        
+        # User exists ?
+        db = get_db()
+        cursor = db.cursor()
+        cursor.execute("SELECT * FROM user WHERE email=?", (email,))
+        existing_user = cursor.fetchone()
+        
+        if existing_user:
+            return render_template('create_user.html', error="L'utilisateur existe déjà.")
+        else:
+            # Insert new user in database
+            cursor.execute("INSERT INTO user (username, email, password) VALUES (?, ?, ?)", (username, email, password))
+            db.commit()
+            close_connection(None) 
+            return redirect(url_for('auth'))
+    else:        
+        return render_template('create_user.html')
+
 @app.route('/user/<username>',endpoint='profile')
 def profile(username): 
     """Connected page - page to begin game
@@ -73,8 +99,8 @@ def profile(username):
 def enigma(username, id_enigma):
     """Handles the display of an enigma page;
     Parameters: username (str) and id_enigma (int).
-    Tables : enigma and bad_response"""   
-       
+    Tables : enigma and bad_response"""      
+      
     db = get_db()
     cursor = db.execute(f"SELECT * FROM enigma WHERE id = ?", (id_enigma,))
     enigma_info = cursor.fetchone()    
@@ -88,9 +114,9 @@ def enigma(username, id_enigma):
         good_response = str(enigma_info['good_response']).encode('iso-8859-1').decode("utf-8") 
         link_good_response = str(enigma_info['link_good_response']).encode('iso-8859-1').decode("utf-8") 
         bad_response = str(bad_responses['bad_responses']).encode('iso-8859-1').decode("utf-8")     
-
+        
         # Pass the enigma information to the HTML template
-        return render_template('enigma.html',
+        return render_template('enigma.html',                               
                                error="Mauvaise réponse", 
                                username=username, 
                                id_enigma=id_enigma, 
@@ -98,7 +124,8 @@ def enigma(username, id_enigma):
                                image_url=image_url, title=title,  
                                bad_response=bad_response, 
                                good_response= good_response, 
-                               link_good_response=link_good_response)
+                               link_good_response=link_good_response,
+                               )
     else:
         # enigma not found    
         return "Énigme non trouvée"
