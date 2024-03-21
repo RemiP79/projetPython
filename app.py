@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import sqlite3
 from flask import Flask, redirect, url_for, render_template,request
 #from markupsafe import escape
@@ -48,7 +50,7 @@ def auth():
         email = request.form['email']
         password = request.form['password']
         db = get_db()
-        cursor = db.execute('SELECT * FROM user WHERE email=? AND password=?', (email, password))
+        cursor = db.execute(f"SELECT * FROM user WHERE email=? AND password=?", (email, password))
         user = cursor.fetchone()
         close_connection(None)
         # Credentials validation
@@ -73,19 +75,19 @@ def enigma(username, id_enigma):
     Parameters: username (str) and id_enigma (int).
     Tables : enigma and bad_response"""   
        
-    db = get_db()       
-    cursor = db.execute('SELECT * FROM enigma WHERE id = ?', (id_enigma,))
+    db = get_db()
+    cursor = db.execute(f"SELECT * FROM enigma WHERE id = ?", (id_enigma,))
     enigma_info = cursor.fetchone()    
-    cursor = db.execute('SELECT * FROM bad_response WHERE id = ?', (id_enigma,))    
+    cursor = db.execute(f"SELECT * FROM bad_response WHERE enigma_id = ?", (id_enigma,))    
     bad_responses = cursor.fetchone()
-    close_connection(None)    
+    close_connection(None)
 
     if enigma_info:
         image_url = enigma_info['image_url']
-        title = enigma_info['title']
-        good_response = enigma_info['good_response']
-        link_good_response = enigma_info['link_good_response']
-        bad_response = bad_responses['bad_responses']       
+        title = str(enigma_info['title']).encode('iso-8859-1').decode("utf-8") 
+        good_response = str(enigma_info['good_response']).encode('iso-8859-1').decode("utf-8") 
+        link_good_response = str(enigma_info['link_good_response']).encode('iso-8859-1').decode("utf-8") 
+        bad_response = str(bad_responses['bad_responses']).encode('iso-8859-1').decode("utf-8")     
 
         # Pass the enigma information to the HTML template
         return render_template('enigma.html',
