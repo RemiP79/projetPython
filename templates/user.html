@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{username}}</title>
+    <title>Bonjour {{username}}</title>
        
     <!--<link rel="stylesheet" href="../static/accueil.css">-->
 </head>
@@ -16,18 +16,13 @@
     {%else%}
         <h1>Bonjour ! !</h1>
     {%endif%}
-    <p>Voulez vous commencer une enigme ?</p>
+    <p>Voulez-vous commencer une enigme ?</p>
     <button><a href=http://127.0.0.1:5000/{{username}}/enigme/1>COMMENCER !!</a></button>
 
-    <p>Ceci est un paragraphe.</p>
-
-    <!-- Inclure des scripts JavaScript
-    <script src="script.js"></script>-->
-
-
+    
     <div id="footer">
         {% block footer %}
-        &copy; Copyright 2008 by <a href="http://domain.invalid/">you</a>.
+        &copy; Copyright 2024 by <a href="http://domain.invalid/">you</a>.
         {% endblock %}
     </div>
 </body>

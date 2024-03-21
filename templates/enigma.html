@@ -8,7 +8,7 @@
 <body>
     <div id="boutonsReponses"><button><a href="{{url_for('welcome')}}">Déconnexion</a></button></div>
     <p>Bienvenue {{username}} sur l'énigme {{id_enigma}}</p>
-    <img src="{{url_for('static', filename=image_url)}}" alt="Image de l'énigme {{id_enigma}}">
+    <img src="{{url_for('static', filename=image_url)}}" alt="Image de l'énigme {{id_enigma}}"  style="max-width: 60%;" />>
     <p>La question : {{title}}</p>
     
     <div id="boutonsReponses"><button onclick="afficherErreur('{{ error }}')">{{bad_response}}</a></button></div>

@@ -15,7 +15,7 @@ CREATE TABLE enigma (
     title TEXT UNIQUE NOT NULL,
     image_url TEXT ,
     good_response TEXT NOT NULL,
-    link_good_response TEXT NOT NULL, --DEFAULT 'http://127.0.0.1:5000/{{username}}/enigme/{{id_enigme+1}}',
+    link_good_response TEXT NOT NULL DEFAULT 'http://127.0.0.1:5000/{{username}}/enigme/{{id_enigme+1}}',
     Message_bad_response TEXT NOT NULL DEFAULT 'Mauvaise réponse ! !' --For future use: Customization of the response 
 );
 
@@ -32,10 +32,10 @@ CREATE TABLE bad_response (
 
 INSERT INTO user (email, username, password) VALUES ('monmail@ngft.com', 'Rem', 'monmotdepasse');
 
-INSERT INTO enigma (title, image_url, good_response, link_good_response, Message_bad_response) VALUES ('Qui est le meilleur prof du monde ?', '/image1.jpg', 'Guillaume', 'http://127.0.0.1:5000/Rem/enigme/2', 'Mauvaise réponse !!!');
+INSERT INTO enigma (title, image_url, good_response, link_good_response, Message_bad_response) VALUES ('Qui est le plus grand fan de python ?', '/image1.jpg', 'Guillaume', 'http://127.0.0.1:5000/Rem/enigme/2', 'Mauvaise réponse !!!');
 INSERT INTO bad_response (bad_responses, enigma_id) VALUES ('Professeur Tournesol', 1);
 
-INSERT INTO enigma (title, image_url, good_response, link_good_response, Message_bad_response) VALUES ('Quel est le meilleur langage du monde ?', '/image2.jpg', 'Python', 'http://127.0.0.1:5000/Rem/enigme/3', 'Mauvaise réponse !!!');
+INSERT INTO enigma (title, image_url, good_response, link_good_response, Message_bad_response) VALUES ('Quel est le meilleur langage de développement ?', '/image2.jpg', 'Le Python', 'http://127.0.0.1:5000/Rem/enigme/3', 'Mauvaise réponse !!!');
 INSERT INTO bad_response (bad_responses, enigma_id) VALUES ('Le Chinois', 2);
 
 INSERT INTO enigma (title, image_url, good_response, link_good_response, Message_bad_response) VALUES ('Quelle est la particularité de Python ?', '/image3.jpg', 'Langage accessible même pour débutant', 'http://127.0.0.1:5000/Rem/enigme/4', 'Mauvaise réponse !!!');
